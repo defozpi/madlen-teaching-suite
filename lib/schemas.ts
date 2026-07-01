@@ -39,7 +39,7 @@ export const InlineNoteSchema = z.object({
 
 export const GradeResultSchema = z.object({
   overall: z.number().min(0).max(100),
-  criteria: z.array(CriterionScoreSchema).min(3).max(4),
+  criteria: z.array(CriterionScoreSchema).min(1).max(4),
   inlineFeedback: z.array(InlineNoteSchema).min(1).max(6),
   summaryForStudent: z.string().min(1),
 });

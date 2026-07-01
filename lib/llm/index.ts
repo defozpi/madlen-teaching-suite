@@ -20,6 +20,7 @@ import {
   type Lang,
   type LessonPlan,
 } from "../schemas";
+import type { CriterionId } from "../criteria";
 import { anthropicConversation, anthropicJSON } from "./anthropic";
 import { demoNote, mockChat, mockGrade, mockLessonPlan } from "./mock";
 import { openaiConversation, openaiJSON } from "./openai";
@@ -76,18 +77,19 @@ export async function getLessonPlan(
 export async function gradeEssay(
   essay: string,
   lang: Lang,
+  criteria: CriterionId[],
 ): Promise<Result<GradeResult>> {
   const provider = providerName();
   if (provider === "demo") {
-    return { data: mockGrade(essay, lang), provider, note: demoNote(lang) };
+    return { data: mockGrade(essay, lang, criteria), provider, note: demoNote(lang) };
   }
   try {
-    const { system, user } = essayGraderPrompt(essay, lang);
+    const { system, user } = essayGraderPrompt(essay, lang, criteria);
     const data = await jsonFor(provider)(system, user, GradeResultSchema);
     return { data, provider };
   } catch (e) {
     return {
-      data: mockGrade(essay, lang),
+      data: mockGrade(essay, lang, criteria),
       provider: "demo",
       note: `${demoNote(lang)} (${e instanceof Error ? e.message : "error"})`,
     };

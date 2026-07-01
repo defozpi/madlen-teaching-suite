@@ -2,6 +2,7 @@
 // a focused system prompt, explicit output contract, and grade/language
 // calibration. Grounding from the curriculum reference is injected when present.
 
+import { criterionLabel, type CriterionId } from "./criteria";
 import { groundingFor } from "./curriculum";
 import { gradeProfile } from "./grade";
 import type { Lang } from "./schemas";
@@ -67,17 +68,21 @@ export function studentChatGrounding(topic: string): string {
 }
 
 // --- Tool 3: Essay Grader -------------------------------------------------
-export function essayGraderPrompt(essay: string, lang: Lang) {
+export function essayGraderPrompt(essay: string, lang: Lang, criteriaIds: CriterionId[]) {
+  const labels = criteriaIds.map((id) => criterionLabel(id, lang));
+  const n = labels.length;
   const system = [
     "You are an experienced, fair teacher giving structured feedback on a student's essay.",
     langLine(lang),
-    "Grade across these 4 criteria, each scored 0-5: Argument/Ideas, Organization/Structure, Clarity/Language, Mechanics/Grammar.",
+    `Grade across EXACTLY these ${n} criteria, each scored 0-5, using these exact names in order: ${labels
+      .map((l) => `"${l}"`)
+      .join(", ")}.`,
     "Be specific and kind. Inline feedback MUST quote short excerpts taken verbatim from the student's essay and comment on each.",
     "The summary is addressed TO the student: encouraging, naming 1-2 strengths and 1-2 concrete next steps.",
     "Return ONLY a single JSON object (no markdown, no code fences) with EXACTLY this shape:",
     `{
-  "overall": number,        // 0-100, roughly the average of criteria scaled to 100
-  "criteria": [             // EXACTLY 4 items
+  "overall": number,        // 0-100, roughly the average of the criteria scores scaled to 100
+  "criteria": [             // EXACTLY ${n} items, one per criterion named above
     { "name": string, "score": number /* 0-5 */, "max": 5, "comment": string }
   ],
   "inlineFeedback": [       // 1-6 items, each quoting the essay

@@ -18,6 +18,7 @@
 
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
+import { CRITERION_IDS } from "../lib/criteria";
 import { gradeEssay } from "../lib/llm";
 import type { Lang } from "../lib/schemas";
 
@@ -34,8 +35,8 @@ async function run() {
   console.log("\n=== Madlen essay-grader eval ===");
 
   for (const c of cases) {
-    const a = await gradeEssay(c.essay, c.lang);
-    const b = await gradeEssay(c.essay, c.lang);
+    const a = await gradeEssay(c.essay, c.lang, CRITERION_IDS);
+    const b = await gradeEssay(c.essay, c.lang, CRITERION_IDS);
 
     const structureOk =
       a.data.criteria.length === 4 &&

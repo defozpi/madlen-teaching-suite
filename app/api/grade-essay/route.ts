@@ -6,8 +6,16 @@ export const runtime = "nodejs";
 export const maxDuration = 60;
 
 const BodySchema = z.object({
-  essay: z.string().min(20, "Please paste a longer essay (at least 20 characters).").max(12000),
+  essay: z
+    .string()
+    .min(150, "Please paste a longer essay (at least 150 characters).")
+    .max(12000),
   lang: LangSchema,
+  criteria: z
+    .array(z.enum(["argument", "organization", "clarity", "mechanics"]))
+    .min(1, "Select at least one criterion.")
+    .max(4)
+    .default(["argument", "organization", "clarity", "mechanics"]),
 });
 
 export async function POST(req: Request) {
@@ -21,7 +29,7 @@ export async function POST(req: Request) {
   if (!parsed.success) {
     return Response.json({ error: parsed.error.issues[0]?.message }, { status: 400 });
   }
-  const { essay, lang } = parsed.data;
-  const result = await gradeEssay(essay, lang);
+  const { essay, lang, criteria } = parsed.data;
+  const result = await gradeEssay(essay, lang, criteria);
   return Response.json(result);
 }

@@ -173,9 +173,9 @@ input:focus, select:focus, textarea:focus { outline: none; border-color: var(--a
 .msg { max-width: 82%; padding: 11px 14px; border-radius: 16px; font-size: 14.5px; white-space: pre-wrap; line-height: 1.5; }
 .msg.user { align-self: flex-end; background: var(--accent); color: #fff; border-bottom-right-radius: 5px; }
 .msg.assistant { align-self: flex-start; background: var(--surface-2); border: 1px solid var(--border); border-bottom-left-radius: 5px; }
-.msg.assistant strong { font-weight: 700; }
-.msg.assistant em { font-style: italic; }
-.msg.assistant code { background: rgba(15, 23, 41, 0.06); padding: 1px 5px; border-radius: 5px; font-size: 0.9em; }
+.msg.assistant strong, .rich strong { font-weight: 700; }
+.msg.assistant em, .rich em { font-style: italic; }
+.msg.assistant code, .rich code { background: rgba(15, 23, 41, 0.06); padding: 1px 5px; border-radius: 5px; font-size: 0.9em; }
 .composer { display: flex; gap: 10px; margin-top: 14px; }
 .composer input { flex: 1; }
 

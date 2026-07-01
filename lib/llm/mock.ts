@@ -5,6 +5,7 @@
 // can be graded without anyone spending on the API. Real quality comes from
 // Claude when ANTHROPIC_API_KEY is set.
 
+import { criterionLabel, type CriterionId } from "../criteria";
 import type { GradeResult, Lang, LessonPlan } from "../schemas";
 
 const DEMO_NOTE = {
@@ -65,31 +66,29 @@ export function mockChat(question: string, lang: Lang, practiceMode: boolean): s
     : `Great question! In short: think about "${question}" with a simple example at your level. Start with the core idea, then an example. How would you explain it to a friend? (Demo-mode reply.)`;
 }
 
-export function mockGrade(essay: string, lang: Lang): GradeResult {
+const MOCK_CRIT: Record<CriterionId, { score: number; tr: string; en: string }> = {
+  argument: { score: 4, tr: "Ana fikir açık, birkaç yerde daha güçlü kanıt gerekli.", en: "Clear main idea; a few claims need stronger evidence." },
+  organization: { score: 4, tr: "Giriş-gelişme-sonuç var; paragraf geçişleri güçlendirilebilir.", en: "Has intro-body-conclusion; transitions could be tighter." },
+  clarity: { score: 3, tr: "Bazı cümleler uzun; daha kısa ve net ifadeler önerilir.", en: "Some sentences run long; aim for shorter, clearer phrasing." },
+  mechanics: { score: 4, tr: "Birkaç küçük yazım hatası dışında temiz.", en: "Mostly clean aside from a few small typos." },
+};
+
+export function mockGrade(essay: string, lang: Lang, criteriaIds: CriterionId[]): GradeResult {
   const tr = lang === "tr";
   const firstSentence =
     essay.trim().split(/(?<=[.!?])\s/)[0]?.slice(0, 120) || essay.trim().slice(0, 80);
-  const crit = (name: string, score: number, comment: string) => ({
-    name,
-    score,
+  const criteria = criteriaIds.map((id) => ({
+    name: criterionLabel(id, lang),
+    score: MOCK_CRIT[id].score,
     max: 5 as const,
-    comment,
-  });
+    comment: tr ? MOCK_CRIT[id].tr : MOCK_CRIT[id].en,
+  }));
+  const overall = Math.round(
+    (criteria.reduce((a, c) => a + c.score, 0) / (criteria.length * 5)) * 100,
+  );
   return {
-    overall: 78,
-    criteria: tr
-      ? [
-          crit("Düşünce/Sav", 4, "Ana fikir açık, birkaç yerde daha güçlü kanıt gerekli."),
-          crit("Düzen/Yapı", 4, "Giriş-gelişme-sonuç var; paragraf geçişleri güçlendirilebilir."),
-          crit("Anlatım/Dil", 3, "Bazı cümleler uzun; daha kısa ve net ifadeler önerilir."),
-          crit("Yazım/Dilbilgisi", 4, "Birkaç küçük yazım hatası dışında temiz."),
-        ]
-      : [
-          crit("Argument/Ideas", 4, "Clear main idea; a few claims need stronger evidence."),
-          crit("Organization/Structure", 4, "Has intro-body-conclusion; transitions could be tighter."),
-          crit("Clarity/Language", 3, "Some sentences run long; aim for shorter, clearer phrasing."),
-          crit("Mechanics/Grammar", 4, "Mostly clean aside from a few small typos."),
-        ],
+    overall,
+    criteria,
     inlineFeedback: [
       {
         quote: firstSentence,

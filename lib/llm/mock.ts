@@ -9,8 +9,8 @@ import { criterionLabel, type CriterionId } from "../criteria";
 import type { GradeResult, Lang, LessonPlan } from "../schemas";
 
 const DEMO_NOTE = {
-  tr: "Demo modu: örnek çıktı. Gerçek yanıtlar için ANTHROPIC_API_KEY ekleyin.",
-  en: "Demo mode: sample output. Add ANTHROPIC_API_KEY for real answers.",
+  tr: "Demo modu: örnek çıktı. Gerçek yanıtlar için bir API anahtarı (OPENAI_API_KEY veya ANTHROPIC_API_KEY) ekleyin.",
+  en: "Demo mode: sample output. Add an API key (OPENAI_API_KEY or ANTHROPIC_API_KEY) for real answers.",
 };
 
 export function demoNote(lang: Lang): string {

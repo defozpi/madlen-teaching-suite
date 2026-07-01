@@ -49,6 +49,33 @@ export async function openaiText(
   return openaiConversation(system, [{ role: "user", content: user }], maxTokens);
 }
 
+// Force valid JSON via the provider's JSON mode when available (DeepSeek, Qwen,
+// Kimi, OpenAI all support it) with a generous token budget so large grader
+// outputs are not truncated. Falls back to a plain call if a provider rejects
+// response_format.
+async function jsonCompletion(system: string, user: string): Promise<string> {
+  const { model } = config();
+  const base = {
+    model,
+    max_tokens: 4096,
+    temperature: 0.3,
+    messages: [
+      { role: "system" as const, content: system },
+      { role: "user" as const, content: user },
+    ],
+  };
+  try {
+    const res = await client().chat.completions.create({
+      ...base,
+      response_format: { type: "json_object" },
+    });
+    return (res.choices[0]?.message?.content ?? "").trim();
+  } catch {
+    const res = await client().chat.completions.create(base);
+    return (res.choices[0]?.message?.content ?? "").trim();
+  }
+}
+
 export async function openaiJSON<T>(
   system: string,
   user: string,
@@ -59,7 +86,7 @@ export async function openaiJSON<T>(
   let prompt = user;
   let lastError = "";
   for (let attempt = 0; attempt < 2; attempt++) {
-    const raw = await openaiText(jsonSystem, prompt, 2048);
+    const raw = await jsonCompletion(jsonSystem, prompt);
     try {
       const parsed = schema.safeParse(extractJSON(raw));
       if (parsed.success) return parsed.data;

@@ -56,7 +56,7 @@ export async function anthropicJSON<T>(
   let prompt = user;
   let lastError = "";
   for (let attempt = 0; attempt < 2; attempt++) {
-    const raw = await anthropicText(system, prompt, 2048);
+    const raw = await anthropicText(system, prompt, 4096);
     try {
       const parsed = schema.safeParse(extractJSON(raw));
       if (parsed.success) return parsed.data;

@@ -10,13 +10,19 @@ export default function Header() {
   const { lang, setLang } = useLang();
   const s = t(lang);
   const [provider, setProvider] = useState<Provider | null>(null);
+  const [model, setModel] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch("/api/status")
+    fetch("/api/status", { cache: "no-store" })
       .then((r) => r.json())
-      .then((d) => setProvider(d.provider))
+      .then((d) => {
+        setProvider(d.provider);
+        setModel(d.model ?? null);
+      })
       .catch(() => setProvider(null));
   }, []);
+
+  const isLive = provider !== null && provider !== "demo";
 
   return (
     <header className="header">
@@ -27,8 +33,8 @@ export default function Header() {
         </Link>
         <div className="spacer" />
         {provider && (
-          <span className={`badge ${provider === "anthropic" ? "live" : "demo"}`}>
-            {provider === "anthropic" ? s.liveBadge : s.demoBadge}
+          <span className={`badge ${isLive ? "live" : "demo"}`}>
+            {isLive ? `${s.liveBadge}${model ? ` · ${model}` : ""}` : s.demoBadge}
           </span>
         )}
         <div className="lang-toggle" role="group" aria-label={s.languageLabel}>

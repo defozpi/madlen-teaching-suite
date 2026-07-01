@@ -24,7 +24,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 
-# installed third-party agent skills (design-taste guidance; treated as tooling,
-# not vendored source). Re-add with: npx skills add <url>
+# installed third-party agent skills (design guidance; treated as tooling,
+# not vendored source). Re-add with: npx skills add <url> / git clone vercel-labs/agent-skills
 /.agents/
+/.claude/
 /skills-lock.json

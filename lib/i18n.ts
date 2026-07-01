@@ -10,7 +10,7 @@ export const STRINGS = {
     suite: "Yapay Zeka Öğretmen Takımı",
     tagline: "Öğretmenler ve öğrenciler için üç hazır sınıf aracı.",
     demoBadge: "Demo modu (API anahtarı yok)",
-    liveBadge: "Canlı (Claude)",
+    liveBadge: "Canlı",
     backHome: "Ana sayfa",
     languageLabel: "Dil",
     // tool cards
@@ -58,7 +58,7 @@ export const STRINGS = {
     suite: "AI Teaching Suite",
     tagline: "Three ready-to-use classroom tools for teachers and students.",
     demoBadge: "Demo mode (no API key)",
-    liveBadge: "Live (Claude)",
+    liveBadge: "Live",
     backHome: "Home",
     languageLabel: "Language",
     lessonTitle: "Lesson Prep Assistant",

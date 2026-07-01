@@ -1,9 +1,11 @@
 // Provider dispatcher with graceful fallback.
 //
-// If ANTHROPIC_API_KEY is set we use Claude; otherwise (or if a live call
-// fails) we fall back to the deterministic demo provider so the app never hard-
-// crashes for a user. Every result carries which provider produced it, so the
-// UI can show an honest badge.
+// Backend selection (cheapest-to-configure wins for a demo):
+//   - LLM_PROVIDER env forces a choice ("openai" | "anthropic" | "demo").
+//   - else if OPENAI_API_KEY is set -> OpenAI-compatible (DeepSeek/Qwen/Kimi/...).
+//   - else if ANTHROPIC_API_KEY is set -> Claude.
+//   - else -> deterministic demo (no key, no cost, still works end to end).
+// If a live call fails, we fall back to the demo output so the UI never crashes.
 
 import {
   essayGraderPrompt,
@@ -18,37 +20,50 @@ import {
   type Lang,
   type LessonPlan,
 } from "../schemas";
-import {
-  anthropicConversation,
-  anthropicJSON,
-  type ChatTurn,
-} from "./anthropic";
+import { anthropicConversation, anthropicJSON } from "./anthropic";
 import { demoNote, mockChat, mockGrade, mockLessonPlan } from "./mock";
+import { openaiConversation, openaiJSON } from "./openai";
+import type { ChatTurn } from "./types";
 
-export type Provider = "anthropic" | "demo";
-
-export function hasApiKey(): boolean {
-  return Boolean(process.env.ANTHROPIC_API_KEY);
-}
+export type Provider = "anthropic" | "openai" | "demo";
 
 export function providerName(): Provider {
-  return hasApiKey() ? "anthropic" : "demo";
+  const forced = process.env.LLM_PROVIDER?.toLowerCase();
+  if (forced === "demo") return "demo";
+  if (forced === "openai") return "openai";
+  if (forced === "anthropic") return "anthropic";
+  if (process.env.OPENAI_API_KEY) return "openai";
+  if (process.env.ANTHROPIC_API_KEY) return "anthropic";
+  return "demo";
+}
+
+export function isLive(): boolean {
+  return providerName() !== "demo";
 }
 
 export type Result<T> = { data: T; provider: Provider; note?: string };
+
+// -- structured helpers route to the active backend ------------------------
+function jsonFor(provider: Provider) {
+  return provider === "openai" ? openaiJSON : anthropicJSON;
+}
+function conversationFor(provider: Provider) {
+  return provider === "openai" ? openaiConversation : anthropicConversation;
+}
 
 export async function getLessonPlan(
   topic: string,
   grade: string,
   lang: Lang,
 ): Promise<Result<LessonPlan>> {
-  if (!hasApiKey()) {
-    return { data: mockLessonPlan(topic, grade, lang), provider: "demo", note: demoNote(lang) };
+  const provider = providerName();
+  if (provider === "demo") {
+    return { data: mockLessonPlan(topic, grade, lang), provider, note: demoNote(lang) };
   }
   try {
     const { system, user } = lessonPrepPrompt(topic, grade, lang);
-    const data = await anthropicJSON(system, user, LessonPlanSchema);
-    return { data, provider: "anthropic" };
+    const data = await jsonFor(provider)(system, user, LessonPlanSchema);
+    return { data, provider };
   } catch (e) {
     return {
       data: mockLessonPlan(topic, grade, lang),
@@ -62,13 +77,14 @@ export async function gradeEssay(
   essay: string,
   lang: Lang,
 ): Promise<Result<GradeResult>> {
-  if (!hasApiKey()) {
-    return { data: mockGrade(essay, lang), provider: "demo", note: demoNote(lang) };
+  const provider = providerName();
+  if (provider === "demo") {
+    return { data: mockGrade(essay, lang), provider, note: demoNote(lang) };
   }
   try {
     const { system, user } = essayGraderPrompt(essay, lang);
-    const data = await anthropicJSON(system, user, GradeResultSchema);
-    return { data, provider: "anthropic" };
+    const data = await jsonFor(provider)(system, user, GradeResultSchema);
+    return { data, provider };
   } catch (e) {
     return {
       data: mockGrade(essay, lang),
@@ -84,17 +100,17 @@ export async function getChatReply(
   lang: Lang,
   practiceMode: boolean,
 ): Promise<Result<string>> {
+  const provider = providerName();
   const latest = [...history].reverse().find((m) => m.role === "user")?.content || "";
-  if (!hasApiKey()) {
-    return { data: mockChat(latest, lang, practiceMode), provider: "demo", note: demoNote(lang) };
+  if (provider === "demo") {
+    return { data: mockChat(latest, lang, practiceMode), provider, note: demoNote(lang) };
   }
   try {
     const grounding = studentChatGrounding(latest);
     const system =
-      studentChatSystem(grade, lang, practiceMode) +
-      (grounding ? `\n\n${grounding}` : "");
-    const data = await anthropicConversation(system, history);
-    return { data, provider: "anthropic" };
+      studentChatSystem(grade, lang, practiceMode) + (grounding ? `\n\n${grounding}` : "");
+    const data = await conversationFor(provider)(system, history);
+    return { data, provider };
   } catch (e) {
     return {
       data: mockChat(latest, lang, practiceMode),

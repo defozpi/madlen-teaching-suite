@@ -61,10 +61,24 @@ You will get a public `*.vercel.app` URL that works immediately. Without the key
 
 ## Configuration
 
+The backend is provider-agnostic and auto-selected: if `OPENAI_API_KEY` is set it
+uses an OpenAI-compatible provider, else if `ANTHROPIC_API_KEY` is set it uses
+Claude, else it runs in demo mode. Because DeepSeek, Qwen, Kimi, OpenRouter and
+others all speak the OpenAI Chat Completions API, you can point at whichever is
+cheapest with three variables.
+
 | Variable | Default | Purpose |
 | --- | --- | --- |
-| `ANTHROPIC_API_KEY` | (empty) | Enables real Claude answers. Empty means demo mode. |
-| `ANTHROPIC_MODEL` | `claude-sonnet-4-6` | Swap to `claude-haiku-4-5` to spend less, or `claude-opus-4-8` for top quality. |
+| `OPENAI_API_KEY` | (empty) | Key for a cheap OpenAI-compatible provider. Setting it selects this backend. |
+| `OPENAI_BASE_URL` | `https://api.deepseek.com` | Provider endpoint (DeepSeek, Qwen, Kimi, OpenRouter, ...). |
+| `OPENAI_MODEL` | `deepseek-chat` | Model id for that provider. |
+| `ANTHROPIC_API_KEY` | (empty) | Use Claude instead (higher quality, pricier). |
+| `ANTHROPIC_MODEL` | `claude-sonnet-4-6` | Claude model when using Anthropic. |
+| `LLM_PROVIDER` | (auto) | Force a backend: `openai`, `anthropic`, or `demo`. |
+
+Cheap presets (see `.env.example` for all): DeepSeek (`deepseek-chat`), Qwen
+(`qwen-turbo`), Kimi (`kimi-k2-0711-preview`), or OpenRouter with a `:free`
+model for zero cost.
 
 ## Project layout
 

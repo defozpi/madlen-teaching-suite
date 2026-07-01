@@ -5,6 +5,8 @@
 
 import Anthropic from "@anthropic-ai/sdk";
 import type { ZodType } from "zod";
+import { extractJSON } from "./json";
+import type { ChatTurn } from "./types";
 
 const MODEL = process.env.ANTHROPIC_MODEL || "claude-sonnet-4-6";
 
@@ -29,8 +31,6 @@ export async function anthropicText(
     .trim();
 }
 
-export type ChatTurn = { role: "user" | "assistant"; content: string };
-
 export async function anthropicConversation(
   system: string,
   messages: ChatTurn[],
@@ -46,17 +46,6 @@ export async function anthropicConversation(
     .map((b) => (b.type === "text" ? b.text : ""))
     .join("")
     .trim();
-}
-
-function extractJSON(raw: string): unknown {
-  // tolerate stray prose or code fences around the JSON object
-  const fenced = raw.replace(/```(?:json)?/gi, "");
-  const start = fenced.indexOf("{");
-  const end = fenced.lastIndexOf("}");
-  if (start === -1 || end === -1 || end < start) {
-    throw new Error("no JSON object found in model output");
-  }
-  return JSON.parse(fenced.slice(start, end + 1));
 }
 
 export async function anthropicJSON<T>(

@@ -3,6 +3,7 @@
 // calibration. Grounding from the curriculum reference is injected when present.
 
 import { groundingFor } from "./curriculum";
+import { gradeProfile } from "./grade";
 import type { Lang } from "./schemas";
 
 function langLine(lang: Lang): string {
@@ -17,7 +18,7 @@ export function lessonPrepPrompt(topic: string, grade: string, lang: Lang) {
   const system = [
     "You are an expert K-12 instructional designer creating a ready-to-use lesson plan for a busy teacher.",
     langLine(lang),
-    `Calibrate vocabulary, depth, and examples to grade ${grade}.`,
+    gradeProfile(grade),
     grounding ? `\n${grounding}\n` : "",
     "Return ONLY a single JSON object (no markdown, no code fences) with EXACTLY this shape:",
     `{
@@ -44,7 +45,7 @@ export function studentChatSystem(grade: string, lang: Lang, practiceMode: boole
   return [
     `You are a friendly, encouraging tutor for a grade ${grade} student.`,
     langLine(lang),
-    `Calibrate every explanation to a grade ${grade} reading level: short sentences, concrete examples, no jargon without explaining it.`,
+    gradeProfile(grade),
     practiceMode
       ? [
           "PRACTICE MODE IS ON. Your goal is to guide the student to discover the answer themselves. You NEVER state the answer.",

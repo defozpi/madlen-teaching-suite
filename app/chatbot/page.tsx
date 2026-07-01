@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import Header from "@/components/Header";
 import { useLang } from "@/components/useLang";
 import { GRADE_OPTIONS, t } from "@/lib/i18n";
+import { mdToSafeHtml } from "@/lib/markdown";
 
 type Msg = { role: "user" | "assistant"; content: string };
 
@@ -86,11 +87,19 @@ export default function ChatbotPage() {
 
           <div className="chat-log" ref={logRef}>
             <div className="msg assistant">{s.chatIntro}</div>
-            {messages.map((m, i) => (
-              <div key={i} className={`msg ${m.role}`}>
-                {m.content}
-              </div>
-            ))}
+            {messages.map((m, i) =>
+              m.role === "assistant" ? (
+                <div
+                  key={i}
+                  className="msg assistant"
+                  dangerouslySetInnerHTML={{ __html: mdToSafeHtml(m.content) }}
+                />
+              ) : (
+                <div key={i} className="msg user">
+                  {m.content}
+                </div>
+              ),
+            )}
             {loading && (
               <div className="msg assistant">
                 <span className="spinner" />

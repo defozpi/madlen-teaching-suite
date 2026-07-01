@@ -24,6 +24,14 @@ export default function ChatbotPage() {
     logRef.current?.scrollTo({ top: logRef.current.scrollHeight });
   }, [messages, loading]);
 
+  // A different grade or mode is a new tutoring context. Reset the conversation
+  // so the new grade profile actually drives the reply instead of the model
+  // echoing the previous grade's answer from the message history.
+  useEffect(() => {
+    setMessages([]);
+    setError("");
+  }, [grade, practice]);
+
   async function send() {
     const text = input.trim();
     if (!text || loading) return;

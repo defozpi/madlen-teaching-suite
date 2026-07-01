@@ -20,7 +20,7 @@ export default function Home() {
       <Header />
       <main className="container">
         <section className="hero">
-          <div className="eyebrow">{lang === "tr" ? "Madlen · Vaka Çalışması" : "Madlen · Case Study"}</div>
+          <div className="eyebrow">{lang === "tr" ? "Planla · Öğret · Değerlendir" : "Plan · Teach · Assess"}</div>
           <h1>{s.suite}</h1>
           <p>{s.tagline}</p>
         </section>
@@ -36,8 +36,8 @@ export default function Home() {
         </section>
         <footer className="foot">
           {lang === "tr"
-            ? "Madlen vaka çalışması için geliştirildi. Claude destekli, anahtar yoksa demo modunda çalışır."
-            : "Built for the Madlen case study. Powered by Claude, runs in demo mode when no key is set."}
+            ? "Defne Özpunar tarafından geliştirildi. Anahtar yoksa demo modunda çalışır."
+            : "Built by Defne Özpunar, runs in demo mode when no key is set."}
         </footer>
       </main>
     </>

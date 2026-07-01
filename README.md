@@ -26,6 +26,15 @@ The interface is bilingual (Turkish and English) with a language toggle.
 - **Light grounding instead of heavy RAG.** These are pure generation tasks, so there is no vector database. A small curriculum reference in [`lib/curriculum.ts`](lib/curriculum.ts) is injected into prompts when the topic matches, which keeps the app deployable to Vercel and avoids a dependency the tasks do not need.
 - **Evaluation.** [`eval/grader-eval.ts`](eval/grader-eval.ts) checks the grader for structural validity and run-to-run score consistency.
 
+## Design direction
+
+The interface deliberately avoids the generic "AI-built" look: no warm cream and
+burnt-orange template palette, no default system font. It uses a cool neutral
+slate base with a single locked emerald accent, Plus Jakarta Sans loaded via
+`next/font`, a tightened type scale, and restrained motion. The direction was
+guided by an anti-slop design-taste skill (installed separately as tooling), then
+applied by hand in [`app/globals.css`](app/globals.css).
+
 ## Tech stack
 
 Next.js (App Router, TypeScript), React, plain CSS (no UI framework), the Anthropic SDK, and `zod`. No database, no Docker. Serverless API routes call Claude on the server so the key is never exposed to the browser.

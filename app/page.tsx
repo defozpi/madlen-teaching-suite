@@ -20,6 +20,7 @@ export default function Home() {
       <Header />
       <main className="container">
         <section className="hero">
+          <div className="eyebrow">{lang === "tr" ? "Madlen · Vaka Çalışması" : "Madlen · Case Study"}</div>
           <h1>{s.suite}</h1>
           <p>{s.tagline}</p>
         </section>

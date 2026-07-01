@@ -4,7 +4,7 @@ Three small, fully functional AI classroom tools, built for the Madlen case stud
 
 1. **Lesson Prep Assistant** (teacher): enter a topic and grade level, get a ready-to-use lesson plan with objectives, key concepts, a 5-slide structure (title, bullets, and a visual suggestion per slide), and 2 to 3 discussion questions. Export the plan by copying it, downloading Markdown, or printing to PDF, each with a plain-language tooltip for non-technical teachers.
 2. **Student Chatbot**: a student asks questions and gets grade-calibrated, age-appropriate answers, rendered with proper formatting. A "practice mode" gives hints and guiding questions instead of the direct answer, and it only credits the student for what they actually wrote.
-3. **Essay Grader** (teacher): paste a student essay and get a score across 4 criteria, inline feedback that quotes the essay, and a short summary the teacher can review before sharing with the student.
+3. **Essay Grader** (teacher): paste a student essay and get scores across teacher-selected criteria (1 to 4), inline feedback that quotes the essay, an overall score with a plain-language label, and a summary the teacher can review and export (copy, Markdown, print/PDF) before sharing. A live character counter enforces a sensible minimum length.
 
 ## How it maps to the case study
 
@@ -14,6 +14,14 @@ Three small, fully functional AI classroom tools, built for the Madlen case stud
 | Usable by a real teacher or student | Clean, polished bilingual UI, grade calibration, export options, a teacher-review step. |
 | Works end to end without errors | Inputs are validated, model output is schema-validated with a retry, and there is a graceful fallback so the UI never hard-crashes. |
 | Deployed to a public URL | Standard Next.js app, one-click deploy on Vercel (see below). |
+
+## Write-ups (case-study deliverables)
+
+- [Process log](docs/PROCESS.md): AI tools used, where I switched direction, deliberate UI/UX decisions, and what I would build next.
+- [Prompt engineering log](docs/PROMPT-ENGINEERING-LOG.md): the actual prompts, how each evolved, and what failed (e.g. practice-mode revealing answers; DeepSeek returning malformed JSON).
+- [Decisions log](docs/DECISIONS.md): the reasoning behind each commit.
+
+Roadmap highlights (details in the process log): turn each slide's "visual suggestion" into a ready-to-paste AI image-generation prompt so teachers can create the image directly; a grader radar chart; grade-aware grading.
 
 ## Engineering principles
 

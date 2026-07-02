@@ -29,3 +29,6 @@ yarn-error.log*
 /.agents/
 /.claude/
 /skills-lock.json
+
+# personal submission PDFs (generated; source lives in docs/)
+/deliverables/
